@@ -30,10 +30,11 @@ sub reply_handler {
       foreach my $rr ($query->answer) {
         next unless $rr->type eq "A";
         $rdata = $rr->address;
+        $qtype = $rr->type;
       }
     }
 
-    if ($rdata ne "") {
+    if ($qtype eq "A") {
       my $ret = new Net::DNS::RR("$qname 3600 $qclass $qtype $rdata");
       push @ans, $ret;
       $rcode = "NOERROR";
