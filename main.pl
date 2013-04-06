@@ -12,8 +12,12 @@ sub reply_handler {
 
   print "* $qname ($qtype) from $peerhost ";
 
+  if ($qtype ne "A") {
+    $filter = 'not A';
+  }
+
   if ($qname =~ /(sex)|(porn)/) {
-    $filter = 'skip';
+    $filter = 'pr0n';
   }
  
   if ($filter eq "ok") {
@@ -41,13 +45,13 @@ sub reply_handler {
       print "-> $rdata ($qtype)\n";
     } else {
       $rcode = "NXDOMAIN";
-      print "-> nada\n";
+      print "-> A entry not found\n";
     }
   } else {
    my $ret = new Net::DNS::RR("$qname 3600 $qclass A 199.181.132.249"); 
    push @ans, $ret;
    $rcode = "NOERROR";
-   print "-> filtered\n";
+   print "-> filtered ($filter)\n";
   }
 
   # mark the answer as authoritive (by setting the 'aa' flag
