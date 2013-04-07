@@ -8,28 +8,25 @@ use Net::DNS::Resolver;
 sub reply_handler {
   my ($qname, $qclass, $qtype, $peerhost,$query,$conn) = @_;
   my ($rdata, $rcode, @ans, @auth, @add);
-  my $filter = "ok";
+  my $action = "lookup";
 
   print "* $qname ($qtype) from $peerhost ";
 
   if ($qtype ne "A") {
-    $filter = 'not A';
+    $action = 'nxdomain';
   }
 
   if ($qname =~ /(sex)|(porn)/) {
-    $filter = 'pr0n';
+    $action = 'forward';
   }
  
-  if ($filter eq "ok") {
-
+  if ($action eq "lookup") {
     my $res = Net::DNS::Resolver->new(
       nameservers => [qw(8.8.8.8 8.8.4.4)],
       recurse     => 1,
       debug       => 0,
     );
-
     $query = $res->search($qname,$qtype);
- 
     if ($query) {
       foreach my $rr ($query->answer) {
         next unless $rr->type eq "A";
@@ -37,7 +34,6 @@ sub reply_handler {
         $qtype = $rr->type;
       }
     }
-
     if ($qtype eq "A") {
       my $ret = new Net::DNS::RR("$qname 3600 $qclass $qtype $rdata");
       push @ans, $ret;
@@ -47,11 +43,14 @@ sub reply_handler {
       $rcode = "NXDOMAIN";
       print "-> A entry not found\n";
     }
+  } elsif ($action eq "forward") {
+    my $ret = new Net::DNS::RR("$qname 3600 $qclass A 199.181.132.249"); 
+    push @ans, $ret;
+    $rcode = "NOERROR";
+    print "-> $action\n";
   } else {
-   my $ret = new Net::DNS::RR("$qname 3600 $qclass A 199.181.132.249"); 
-   push @ans, $ret;
-   $rcode = "NOERROR";
-   print "-> filtered ($filter)\n";
+    $rcode = "NXDOMAIN";
+    print "-> $action\n"; 
   }
 
   # mark the answer as authoritive (by setting the 'aa' flag
