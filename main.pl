@@ -44,7 +44,7 @@ sub reply_handler {
       print "-> A entry not found\n";
     }
   } elsif ($action eq "forward") {
-    my $ret = new Net::DNS::RR("$qname 3600 $qclass A 199.181.132.249"); 
+    my $ret = new Net::DNS::RR("$qname 3600 $qclass A 80.76.124.4"); 
     push @ans, $ret;
     $rcode = "NOERROR";
     print "-> $action\n";
