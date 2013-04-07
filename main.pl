@@ -7,7 +7,8 @@ use Net::DNS::Resolver;
  
 sub reply_handler {
   my ($qname, $qclass, $qtype, $peerhost,$query,$conn) = @_;
-  my ($rdata, $rcode, @ans, @auth, @add);
+  my $rdata = "";
+  my ($rcode, @ans, @auth, @add);
   my $action = "lookup";
 
   print "* $qname ($qtype) from $peerhost ";
@@ -34,7 +35,7 @@ sub reply_handler {
         $qtype = $rr->type;
       }
     }
-    if ($qtype eq "A") {
+    if ($rdata ne "") {
       my $ret = new Net::DNS::RR("$qname 3600 $qclass $qtype $rdata");
       push @ans, $ret;
       $rcode = "NOERROR";
