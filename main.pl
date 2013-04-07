@@ -21,6 +21,10 @@ sub reply_handler {
     $action = 'nxdomain';
   }
 
+  if ($qname !~ /\./) {
+    $action = 'nxdomain';
+  }
+
   if ($qname =~ /(sex)|(porn)/) {
     $action = 'forward';
   }
@@ -57,7 +61,7 @@ sub reply_handler {
     print 'ˆ';
     print $log "-> $action\n";
   } else {
-    print 'x';
+    print '!';
     $rcode = "NXDOMAIN";
     print $log "-> $action\n"; 
   }
